@@ -29,13 +29,13 @@ def build_frequency_table():
                     for key in new.keys():
                         if key == 'title' or key == 'html':
                             for i in range(0, len(new[key]) - 1):
-                                if is_chn_char(new[key][i]) and is_chn_char(
-                                        new[key][i + 1]):
-                                    word = new[key][i] + new[key][i + 1]
+                                if is_chn_char(new[key][i]): 
+                                    word = new[key][i] + (new[key][i + 1] if is_chn_char(new[key][i + 1]) else '$')
                                     if word in frequency_table.keys():
                                         frequency_table[word] += 1
                                     else:
                                         frequency_table[word] = 1
+
 
     frequency_table={key:value for key,value in frequency_table.items() if value>=3} # 只保留频率较大的
     with open(SAVE_PATH,'w',) as savef:
