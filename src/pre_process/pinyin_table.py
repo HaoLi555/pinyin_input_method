@@ -9,8 +9,10 @@ SAVE_PATH = Path(os.getcwd()).joinpath('src', 'data', 'pinyin_table.txt')
 
 
 def build_pinyin_table():
-    with open(RAW_PINYIN_TABLE_PATH, 'r', encoding='GBK') as f:
-        with open(RAW_CHN_CHARS_TABLE_PATH, 'r', encoding='GBK') as ref:
+    with open(RAW_PINYIN_TABLE_PATH, 'r',
+              encoding='GBK') as f:  # encoding='GBK'
+        with open(RAW_CHN_CHARS_TABLE_PATH, 'r',
+                  encoding='GBK') as ref:  # encoding='GBK'
             valid_chn_chars = ref.read()  # 一二级汉字表
             pinyin_table = {}
             for line in f.readlines():
