@@ -26,6 +26,8 @@ def build_pinyin_table():
             with open(SAVE_PATH, 'w') as savef:
                 json.dump(pinyin_table, savef,
                           ensure_ascii=False)  # ensure_ascii=False
+
+
     return
 
 
