@@ -4,7 +4,6 @@ import math
 from tqdm import tqdm
 
 
-# NOTE：当前的目录是根目录，这里后续还要修改！
 PINYIN_TABLE_PATH = "src/data/pinyin_table.txt"
 
 
@@ -126,7 +125,7 @@ def pinyin_to_chn_chars(input_pinyin, trigram, bigram_weight, trigram_weight):
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
-    # NOTE：当前的目录是根目录，这里后续还要修改！
+
     parser.add_argument(
         "--input_path", type=str, default="data/input.txt", help="Input file path."
     )
