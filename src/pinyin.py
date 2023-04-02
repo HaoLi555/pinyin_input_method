@@ -7,19 +7,19 @@ from tqdm import tqdm
 # NOTE：当前的目录是根目录，这里后续还要修改！
 PINYIN_TABLE_PATH='src/data/pinyin_table.txt'
 FREQUENCY_TABLE_PATH='src/data/frequency_table.txt'
-INPUT_PATH=''
-OUTPUT_PATH=''
+TRIGRAM_FREQUENCY_TABLE_PATH='src/data/trigram_frequency_table.txt'
+
 pinyin_table={}
 frequency_table={}
+trigram_frequency_table={}
 
-# DEFAULT_CHAR_COUNT=1
-# DEFAULT_WORD_COUNT=1
-SMALL_PROBABILITY=1e-10
+
+SMALL_PROBABILITY=1e-20
 TOT_CHAR=10_000_000_000
 
-def read_pinyin():
+def read_pinyin(input_path):
     input_pinyin=[]# 需要转换的拼音
-    with open(INPUT_PATH,'r') as readf:
+    with open(input_path,'r') as readf:
         lines=readf.readlines()
         lines[-1]+='\n' # 为了处理最后一个拼音
         for line in lines:
@@ -34,7 +34,7 @@ def read_pinyin():
             input_pinyin.append(pinyin_sentence)
     return input_pinyin
 
-def pinyin_to_chn_chars(input_pinyin):
+def pinyin_to_chn_chars(input_pinyin,trigram):
     
     chn_output=[]
     for pinyin_sentence in tqdm(input_pinyin,desc="Processing sentences"):
@@ -43,7 +43,7 @@ def pinyin_to_chn_chars(input_pinyin):
             assert pinyin in pinyin_table.keys()
             words_sequence.append(pinyin_table[pinyin])
         
-
+        # 每一层的结构：list内嵌套tuple:(字符串，指标)
         last_layer=[] # 上一层
         now_layer=[] # 当前层
         # NOTE：平滑处理的优化
@@ -62,10 +62,14 @@ def pinyin_to_chn_chars(input_pinyin):
                 for i in words:
                     metric_max=('',-1)
                     for j in last_layer:
-                        # 此时的j的结构：(几个字的str，-log)
+
                         # NOTE:为0时的处理：给一个小概率
-                        metric=-math.log(frequency_table[j[0][-1]+i]/frequency_table[j[0][-1]])+j[1] if j[0][-1]+i in frequency_table.keys()  else -math.log(SMALL_PROBABILITY)+j[1]
-                        
+                        # 二元模型
+                        if not trigram or index==1:
+                            metric=-math.log(frequency_table[j[0][-1]+i]/frequency_table[j[0][-1]])+j[1] if j[0][-1]+i in frequency_table.keys()  else -math.log(SMALL_PROBABILITY)+j[1]
+                        else:
+                            metric=-math.log(trigram_frequency_table[j[0][-2:]+i]/frequency_table[j[0][-2:]])+j[1] if j[0][-2:]+i in trigram_frequency_table.keys()  else -math.log(SMALL_PROBABILITY)+j[1]
+
                         if metric<=metric_max[1] or metric_max[1]==-1:
                             metric_max=(j[0]+i,metric)
 
@@ -76,11 +80,9 @@ def pinyin_to_chn_chars(input_pinyin):
         chn_sentence=min(last_layer,key=lambda x:x[1])[0]
         chn_output.append(chn_sentence)
     
+    return chn_output
 
-    with open(OUTPUT_PATH,'w') as f:
-        f.write(chn_output[0])
-        for i in range(1,len(chn_output)):
-            f.write('\n'+chn_output[i])
+
 
 
 
@@ -91,18 +93,28 @@ if __name__=='__main__':
     # NOTE：当前的目录是根目录，这里后续还要修改！
     parser.add_argument('--input_path',type=str,default='data/input.txt',help='Input file path.')
     parser.add_argument('--output_path',type=str,default='data/output.txt',help='Output file path.')
+    parser.add_argument('--trigram',action='store_true',help='Whether to use a trigram model.')
     args=parser.parse_args()
 
-    INPUT_PATH=args.input_path
-    OUTPUT_PATH=args.output_path
+    input_path=args.input_path
+    output_path=args.output_path
+    trigram=args.trigram
 
     with open(PINYIN_TABLE_PATH,'r') as f:
         pinyin_table=json.load(f)
     with open(FREQUENCY_TABLE_PATH,'r') as f:
         frequency_table=json.load(f)
+    if trigram:
+        with open(TRIGRAM_FREQUENCY_TABLE_PATH,'r') as f:
+            trigram_frequency_table=json.load(f)
 
-    input_pinyin=read_pinyin()
-    pinyin_to_chn_chars(input_pinyin)
+    input_pinyin=read_pinyin(input_path=input_path)
+    chn_output=pinyin_to_chn_chars(input_pinyin,trigram=trigram)
+
+    with open(output_path,'w') as f:
+        f.write(chn_output[0])
+        for i in range(1,len(chn_output)):
+            f.write('\n'+chn_output[i])
 
 
 
