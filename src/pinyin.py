@@ -6,8 +6,7 @@ from tqdm import tqdm
 
 # NOTE：当前的目录是根目录，这里后续还要修改！
 PINYIN_TABLE_PATH='src/data/pinyin_table.txt'
-FREQUENCY_TABLE_PATH='src/data/frequency_table.txt'
-TRIGRAM_FREQUENCY_TABLE_PATH='src/data/trigram_frequency_table.txt'
+
 
 pinyin_table={}
 frequency_table={}
@@ -94,18 +93,23 @@ if __name__=='__main__':
     parser.add_argument('--input_path',type=str,default='data/input.txt',help='Input file path.')
     parser.add_argument('--output_path',type=str,default='data/output.txt',help='Output file path.')
     parser.add_argument('--trigram',action='store_true',help='Whether to use a trigram model.')
+    parser.add_argument('--frequency_table_path',type=str,default='src/data/frequency_table.txt',help='Path of frequency table file.')
+    parser.add_argument('--trigram_frequency_table_path',type=str,default='src/data/trigram_frequency_table.txt',help='Path of trigram frequency table file.')
+
     args=parser.parse_args()
 
     input_path=args.input_path
     output_path=args.output_path
     trigram=args.trigram
+    frequency_table_path=args.frequency_table_path
+    trigram_frequency_table_path=args.trigram_frequency_table_path
 
     with open(PINYIN_TABLE_PATH,'r') as f:
         pinyin_table=json.load(f)
-    with open(FREQUENCY_TABLE_PATH,'r') as f:
+    with open(frequency_table_path,'r') as f:
         frequency_table=json.load(f)
     if trigram:
-        with open(TRIGRAM_FREQUENCY_TABLE_PATH,'r') as f:
+        with open(trigram_frequency_table_path,'r') as f:
             trigram_frequency_table=json.load(f)
 
     input_pinyin=read_pinyin(input_path=input_path)
