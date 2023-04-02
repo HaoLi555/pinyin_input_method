@@ -1,0 +1,10 @@
+black @ file:///opt/conda/conda-bld/black_1660237809219/work
+certifi @ file:///croot/certifi_1671487769961/work/certifi
+click @ file:///tmp/build/80754af9/click_1646056590078/work
+flit_core @ file:///croot/flit-core_1679397103445/work/source/flit_core
+mypy-extensions==0.4.3
+pathspec @ file:///croot/pathspec_1674681560568/work
+platformdirs @ file:///opt/conda/conda-bld/platformdirs_1662711380096/work
+tomli @ file:///opt/conda/conda-bld/tomli_1657175507142/work
+tqdm @ file:///croot/tqdm_1679561862951/work
+typing_extensions @ file:///croot/typing_extensions_1669924550328/work
